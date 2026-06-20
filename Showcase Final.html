@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXON — Intelligence You Can Wear</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0077ff;--accent2:#00a8ff;--white:#0a0e17;--bg:#ffffff;--bg2:#f4f6fa;--text-dim:rgba(10,14,23,.6)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--white);overflow:hidden;height:100vh;width:100vw}
+
+/* ── LANDING ── */
+#landing{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);transition:opacity 1s ease,visibility 1s}
+#landing.out{opacity:0;visibility:hidden;pointer-events:none}
+#landing .bg-img{position:absolute;inset:0;background:url('https://images.pexels.com/videos/8781653/adult-architecture-bench-building-8781653.jpeg?auto=compress&cs=tinysrgb&w=1920') center/cover;opacity:0.16;animation:slowZoom 20s ease-in-out infinite alternate}
+#landing .overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,255,255,0.45),rgba(255,255,255,0.9))}
+.land-content{position:relative;z-index:2;text-align:center}
+.land-logo{font-family:'Space Grotesk',sans-serif;font-size:clamp(64px,14vw,140px);font-weight:800;letter-spacing:16px;line-height:1;background:linear-gradient(135deg,#0a0e17 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.land-sub{font-size:clamp(12px,1.8vw,18px);letter-spacing:8px;text-transform:uppercase;color:rgba(10,14,23,0.55);margin:12px 0 56px}
+#playBtn{width:90px;height:90px;border-radius:50%;border:2px solid rgba(0,168,255,0.6);background:rgba(0,168,255,0.08);cursor:pointer;position:relative;transition:all .3s}
+#playBtn:hover{background:rgba(0,168,255,0.2);border-color:var(--accent);transform:scale(1.06)}
+#playBtn::after{content:'';display:block;border-style:solid;border-width:16px 0 16px 28px;border-color:transparent transparent transparent var(--accent);margin:auto;position:absolute;inset:0;width:0;height:0;margin-left:34px;margin-top:27px}
+.ripple{position:absolute;inset:-20px;border-radius:50%;border:1px solid var(--accent);opacity:0;animation:rip 2.5s ease-out infinite}
+.ripple:nth-child(2){animation-delay:.8s}
+@keyframes rip{0%{transform:scale(.8);opacity:.4}100%{transform:scale(1.8);opacity:0}}
+.hint{margin-top:28px;font-size:11px;color:rgba(10,14,23,0.4);letter-spacing:4px;text-transform:uppercase}
+
+/* ── SECTIONS ── */
+.sec{position:fixed;inset:0;z-index:10;opacity:0;visibility:hidden;transition:opacity 1.2s ease,visibility 1.2s}
+.sec.active{opacity:1;visibility:visible}
+.sec-bg{position:absolute;inset:0;overflow:hidden;background:var(--bg2)}
+.bg-layer{position:absolute;inset:-2%;background-size:cover;background-position:center;opacity:0;transition:opacity 1.6s ease;will-change:opacity,transform}
+.bg-layer.show{opacity:1}
+.bg-layer.kbA{animation:kbA 6.5s ease-out forwards}
+.bg-layer.kbB{animation:kbB 6.5s ease-out forwards}
+.bg-layer.kbC{animation:kbC 6.5s ease-out forwards}
+@keyframes kbA{0%{transform:scale(1.05) translate(0,0)}100%{transform:scale(1.16) translate(-2.5%,-1.5%)}}
+@keyframes kbB{0%{transform:scale(1.16) translate(2.5%,1.5%)}100%{transform:scale(1.05) translate(0,0)}}
+@keyframes kbC{0%{transform:scale(1.04) translate(2%,-1%)}100%{transform:scale(1.15) translate(-1.5%,1.5%)}}
+@keyframes slowZoom{0%{transform:scale(1)}100%{transform:scale(1.15)}}
+.sec-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;transform:scale(1.06);z-index:1;pointer-events:none}
+.sec-vid.show{opacity:1}
+.sec-overlay{position:absolute;inset:0;z-index:2}
+.sec-content{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5vh 6vw;text-align:center}
+#s3 .sec-bg,#s5 .sec-bg,#s6 .sec-bg{background:radial-gradient(ellipse at 50% 38%,rgba(0,119,255,0.10),var(--bg2) 72%);animation:glowPulse 8s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{filter:brightness(.97)}50%{filter:brightness(1.04)}}
+
+/* ── TYPOGRAPHY ── */
+.eyebrow{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;opacity:0;transform:translateY(15px);transition:all .7s ease .2s;text-shadow:0 0 5px rgba(255,255,255,.95),0 1px 10px rgba(255,255,255,.9)}
+.sec.active .eyebrow{opacity:1;transform:translateY(0)}
+.hero-num{font-family:'Space Grotesk',sans-serif;font-size:clamp(72px,16vw,160px);font-weight:800;line-height:.9;background:linear-gradient(135deg,var(--white),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:scale(.85);transition:all .9s ease .3s;filter:drop-shadow(0 2px 3px rgba(255,255,255,.95)) drop-shadow(0 0 16px rgba(255,255,255,.82))}
+.sec.active .hero-num{opacity:1;transform:scale(1)}
+.headline{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,6vw,64px);font-weight:700;line-height:1.1;opacity:0;transform:translateY(25px);transition:all .8s ease .3s;max-width:900px;text-shadow:0 0 3px rgba(255,255,255,.92),0 2px 10px rgba(255,255,255,.95),0 1px 26px rgba(255,255,255,.7)}
+.sec.active .headline{opacity:1;transform:translateY(0)}
+.subline{font-size:clamp(14px,2vw,20px);font-weight:400;color:rgba(10,14,23,0.72);max-width:600px;line-height:1.6;margin-top:16px;opacity:0;transform:translateY(15px);transition:all .7s ease .6s;text-shadow:0 0 3px rgba(255,255,255,.95),0 1px 10px rgba(255,255,255,.92)}
+.sec.active .subline{opacity:1;transform:translateY(0)}
+
+/* ── DEVICE STRIP ── */
+.devices{display:flex;gap:clamp(16px,4vw,40px);margin-top:40px;opacity:0;transition:all .8s ease .7s}
+.sec.active .devices{opacity:1}
+.dev{display:flex;flex-direction:column;align-items:center;gap:10px}
+.dev-icon{width:clamp(56px,8vw,80px);height:clamp(56px,8vw,80px);border-radius:16px;border:1px solid rgba(0,119,255,0.28);background:rgba(255,255,255,0.7);box-shadow:0 8px 24px rgba(10,14,23,0.08);display:flex;align-items:center;justify-content:center;font-size:clamp(24px,4vw,36px);backdrop-filter:blur(10px);transition:all .3s}
+.dev-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(10,14,23,0.62);text-shadow:0 0 4px rgba(255,255,255,.92),0 1px 8px rgba(255,255,255,.88)}
+.dev:hover .dev-icon{border-color:var(--accent);background:rgba(0,168,255,0.15);transform:translateY(-4px)}
+
+/* ── DETECTION VIZ ── */
+.det-frame{position:relative;width:min(700px,88vw);height:min(400px,50vh);border:6px solid #fff;border-radius:16px;overflow:hidden;background:#0c0f15;box-shadow:0 24px 60px rgba(10,14,23,0.22),0 0 0 1px rgba(10,14,23,0.06);margin-top:28px;opacity:0;transform:scale(.95);transition:all .8s ease .5s}
+.sec.active .det-frame{opacity:1;transform:scale(1)}
+.det-frame .frame-bg{position:absolute;inset:0;background:#0c0f15}
+.det-svg{position:absolute;inset:0;width:100%;height:100%}
+.det-svg .dets{opacity:0}
+.sec.active .det-svg .dets{opacity:1;transition:opacity .6s ease .5s}
+.det-svg .dets rect[stroke]{filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
+.det-box{position:absolute;border:2.5px solid;border-radius:4px;opacity:0;transition:opacity .4s ease,top .6s ease,left .6s ease,width .6s ease,height .6s ease,border-color .4s ease;box-shadow:0 0 12px rgba(0,0,0,0.4)}
+.sec.active .det-box{opacity:1}
+.det-box .lbl{position:absolute;top:-20px;left:-1px;font-size:10px;padding:2px 8px;border-radius:3px 3px 3px 0;font-weight:600;letter-spacing:.5px;white-space:nowrap;transition:background .4s ease}
+.b1{top:14%;left:9%;width:17%;height:55%;border-color:#2ed573}.b1 .lbl{background:#2ed573;color:#000}
+.b2{top:20%;left:40%;width:15%;height:48%;border-color:#2ed573}.b2 .lbl{background:#2ed573;color:#000}
+.b3{top:30%;left:68%;width:16%;height:40%;border-color:#ffa502}.b3 .lbl{background:#ffa502;color:#000}
+.b4{top:8%;left:80%;width:11%;height:17%;border-color:#ff6b81}.b4 .lbl{background:#ff6b81;color:#fff}
+.b5{top:78%;left:16%;width:60%;height:12%;border-color:#00a8ff}.b5 .lbl{background:#00a8ff;color:#000}
+.scan{position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);animation:scanY 2.5s linear infinite;opacity:.7}
+@keyframes scanY{0%{top:0}100%{top:100%}}
+.fpsbadge{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);border:1px solid var(--accent);border-radius:6px;padding:4px 12px;font-family:'Space Grotesk',monospace;font-size:12px;color:var(--accent);backdrop-filter:blur(6px)}
+.classbadge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.6)}
+
+/* ── VOICE VIZ ── */
+.wave-wrap{display:flex;align-items:center;gap:3px;height:80px;margin:28px 0;opacity:0;transition:all .7s ease .5s}
+.sec.active .wave-wrap{opacity:1}
+.wbar{width:4px;border-radius:2px;background:linear-gradient(to top,var(--accent),var(--accent2));animation:wPulse 1s ease-in-out infinite alternate}
+@keyframes wPulse{0%{height:6px;opacity:.25}100%{height:56px;opacity:1}}
+.voice-cmd{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,3.5vw,32px);font-weight:600;color:var(--accent);margin-bottom:8px;opacity:0;transition:all .7s ease .3s;text-shadow:0 0 4px rgba(255,255,255,.95),0 1px 12px rgba(255,255,255,.9)}
+.sec.active .voice-cmd{opacity:1}
+
+/* ── STATS ── */
+.stats-grid{display:flex;gap:clamp(20px,4vw,48px);margin-top:36px;flex-wrap:wrap;justify-content:center}
+.scard{text-align:center;opacity:0;transform:translateY(30px);transition:all .7s ease}
+.sec.active .scard:nth-child(1){opacity:1;transform:translateY(0);transition-delay:.3s}
+.sec.active .scard:nth-child(2){opacity:1;transform:translateY(0);transition-delay:.5s}
+.sec.active .scard:nth-child(3){opacity:1;transform:translateY(0);transition-delay:.7s}
+.sec.active .scard:nth-child(4){opacity:1;transform:translateY(0);transition-delay:.9s}
+.scard-num{font-family:'Space Grotesk',sans-serif;font-size:clamp(40px,8vw,72px);font-weight:700;background:linear-gradient(135deg,var(--white),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.scard-label{font-size:11px;color:rgba(10,14,23,0.5);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.stats-grid2{display:flex;gap:clamp(20px,4vw,48px);margin-top:20px;flex-wrap:wrap;justify-content:center}
+.sec.active .stats-grid2 .scard:nth-child(1){opacity:1;transform:translateY(0);transition-delay:1.1s}
+.sec.active .stats-grid2 .scard:nth-child(2){opacity:1;transform:translateY(0);transition-delay:1.3s}
+.sec.active .stats-grid2 .scard:nth-child(3){opacity:1;transform:translateY(0);transition-delay:1.5s}
+
+/* ── CLOSING ── */
+.close-logo{font-family:'Space Grotesk',sans-serif;font-size:clamp(56px,12vw,120px);font-weight:800;letter-spacing:12px;background:linear-gradient(135deg,#0a0e17 30%,var(--accent) 70%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:scale(.9);transition:all 1s ease .2s;filter:drop-shadow(0 3px 16px rgba(255,255,255,.8))}
+.sec.active .close-logo{opacity:1;transform:scale(1)}
+.close-tag{font-family:'Space Grotesk',sans-serif;font-size:clamp(16px,2.5vw,24px);font-weight:500;color:var(--accent);margin-top:12px;opacity:0;transition:all .8s ease .7s;text-shadow:0 0 4px rgba(255,255,255,.95),0 1px 12px rgba(255,255,255,.9)}
+.sec.active .close-tag{opacity:1}
+.close-team{font-size:15px;letter-spacing:4px;color:rgba(10,14,23,0.5);margin-top:28px;opacity:0;transition:all .7s ease 1s;text-shadow:0 0 3px rgba(255,255,255,.9),0 1px 10px rgba(255,255,255,.86)}
+.sec.active .close-team{opacity:1}
+.badges{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center;opacity:0;transition:all .7s ease 1.3s}
+.sec.active .badges{opacity:1}
+.badge{padding:6px 18px;border:1px solid rgba(0,168,255,0.25);border-radius:24px;font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;backdrop-filter:blur(4px);background:rgba(0,168,255,0.05)}
+
+/* ── CONTROLS ── */
+#ctrl{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 28px 20px;background:transparent;display:none;align-items:center;gap:14px}
+#ctrl.on{display:flex}
+/* clean capture mode (add #record to the URL): hide controls + cursor for a pristine recording */
+body.rec #ctrl{display:none!important}
+body.rec,body.rec *{cursor:none!important}
+#pbar{flex:1;height:3px;background:rgba(10,14,23,.12);border-radius:2px;cursor:pointer;position:relative}
+#pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;width:0;transition:width .3s linear}
+.cbtn{width:34px;height:34px;border:1px solid rgba(10,14,23,.28);background:0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--white);font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+.cbtn:hover{border-color:var(--accent);background:rgba(0,119,255,.1)}
+.pi span{display:block;width:3px;height:12px;background:#0a0e17;border-radius:1px}
+.pi{display:flex;gap:3px}
+.play-tri{border-style:solid;border-width:6px 0 6px 11px;border-color:transparent transparent transparent #0a0e17}
+#tdisp{font-family:'Space Grotesk',monospace;font-size:11px;color:rgba(10,14,23,.6);min-width:76px;text-align:right;text-shadow:0 0 5px rgba(255,255,255,.85),0 1px 6px rgba(255,255,255,.8)}
+
+/* ── PRELOADER ── */
+#preloader{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .6s;flex-direction:column;gap:16px}
+#preloader.done{opacity:0;pointer-events:none}
+.loader-ring{width:40px;height:40px;border:2px solid rgba(0,168,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(10,14,23,.4)}
+
+/* ── TEXT OVER FOOTAGE (s1-s4, s7): white + soft dark shadow so footage stays 100% clean ── */
+#s1 .eyebrow,#s2 .eyebrow,#s3 .eyebrow,#s4 .eyebrow{color:#dcecff;text-shadow:0 1px 2px rgba(0,0,0,.6),0 2px 12px rgba(0,0,0,.55)}
+#s2 .headline,#s3 .headline,#s4 .headline{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55),0 3px 20px rgba(0,0,0,.6)}
+#s1 .subline,#s2 .subline,#s3 .subline{color:#f4f9ff;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 16px rgba(0,0,0,.5)}
+#s3 .dev-label{color:#eaf3ff;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 10px rgba(0,0,0,.5)}
+#s1 .hero-num,#s7 .close-logo{background:linear-gradient(135deg,#ffffff 40%,#bfe1ff);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)) drop-shadow(0 4px 18px rgba(0,0,0,.45))}
+#s7 .close-tag{color:#dcecff;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 14px rgba(0,0,0,.55)}
+#s7 .close-team{color:#f4f9ff;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 14px rgba(0,0,0,.5)}
+#s7 .badge{color:#eaf3ff;border-color:rgba(255,255,255,.5);background:rgba(0,0,0,.28);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Loading AXON</div>
+</div>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="bg-img"></div>
+  <div class="overlay"></div>
+  <div class="land-content">
+    <div class="land-logo">AXON</div>
+    <div class="land-sub">Intelligence you can wear</div>
+    <button id="playBtn" aria-label="Play"><span class="ripple"></span><span class="ripple"></span></button>
+    <div class="hint">Click to experience</div>
+  </div>
+</div>
+
+<!-- S1: HOOK -->
+<div class="sec" id="s1">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:transparent"></div>
+  <div class="sec-content">
+    <div class="eyebrow">Global impact</div>
+    <div class="hero-num">43M</div>
+    <div class="subline">people live with visual impairment.<br>Crossing a street can be life-threatening.</div>
+  </div>
+</div>
+
+<!-- S2: PROBLEM -->
+<div class="sec" id="s2">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:transparent"></div>
+  <div class="sec-content">
+    <div class="eyebrow">The challenge</div>
+    <div class="headline">The world is full of<br>invisible dangers</div>
+    <div class="subline">Existing tools weren't designed to see them all.</div>
+  </div>
+</div>
+
+<!-- S3: SOLUTION -->
+<div class="sec" id="s3">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:transparent"></div>
+  <div class="sec-content">
+    <div class="eyebrow">The solution</div>
+    <div class="headline">Meet AXON</div>
+    <div class="subline">Your real-time AI co-pilot.</div>
+    <div class="devices">
+      <div class="dev"><div class="dev-icon">👓</div><div class="dev-label">Meta AI Glasses</div></div>
+      <div class="dev"><div class="dev-icon">📱</div><div class="dev-label">iPhone</div></div>
+      <div class="dev"><div class="dev-icon">🎧</div><div class="dev-label">AirPods</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: PASSIVE LOOP -->
+<div class="sec" id="s4">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:transparent"></div>
+  <div class="sec-content">
+    <div class="eyebrow">Loop 1 · Always on</div>
+    <div class="headline">Passive safety</div>
+    <div class="det-frame">
+      <svg class="det-svg" viewBox="0 0 700 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#26344d"/><stop offset="1" stop-color="#3c4d6a"/>
+          </linearGradient>
+          <g id="person"><circle cx="20" cy="14" r="11"/><path d="M9,28 Q20,22 31,28 L29,72 L25,112 L20,86 L15,112 L11,72 Z"/></g>
+        </defs>
+        <rect width="700" height="400" fill="#0c0f15"/>
+        <rect width="700" height="158" fill="url(#skyG)"/>
+        <path d="M0,158 V70 H60 V40 H112 V158 Z" fill="#11161f"/>
+        <path d="M700,158 V58 H640 V92 H598 V158 Z" fill="#10141d"/>
+        <rect x="122" y="96" width="58" height="62" fill="#141a25"/>
+        <rect x="520" y="102" width="70" height="56" fill="#131823"/>
+        <polygon points="60,400 640,400 408,158 292,158" fill="#191c22"/>
+        <polygon points="0,400 60,400 292,158 210,158" fill="#23272f"/>
+        <polygon points="700,400 640,400 408,158 498,158" fill="#22262e"/>
+        <g stroke="#3a4250" stroke-width="3" stroke-dasharray="14 12"><line x1="350" y1="400" x2="350" y2="160"/></g>
+        <!-- detectable objects (each is wrapped by a box below) -->
+        <g fill="#cdd6e2"><use href="#person" transform="translate(95,205) scale(1.25)"/></g>
+        <g fill="#cdd6e2"><use href="#person" transform="translate(560,210) scale(1.05)"/></g>
+        <g stroke="#cdd6e2" stroke-width="3" fill="none">
+          <circle cx="252" cy="300" r="24"/><circle cx="314" cy="300" r="24"/>
+          <path d="M252,300 L292,300 L302,262 L270,300 M302,262 L298,300 M302,262 L320,258"/>
+        </g>
+        <g fill="#cdd6e2"><use href="#person" transform="translate(282,214) scale(0.9)"/></g>
+        <g>
+          <rect x="398" y="206" width="120" height="34" rx="9" fill="#aeb8c6"/>
+          <path d="M424,206 L440,187 L486,187 L500,206 Z" fill="#9aa6b6"/>
+          <rect x="432" y="190" width="52" height="14" rx="3" fill="#5b6573"/>
+          <circle cx="424" cy="242" r="11" fill="#222831"/><circle cx="494" cy="242" r="11" fill="#222831"/>
+        </g>
+        <g>
+          <rect x="632" y="150" width="6" height="100" fill="#5a626e"/>
+          <rect x="623" y="112" width="24" height="48" rx="5" fill="#1a1f2a"/>
+          <circle cx="635" cy="123" r="5" fill="#ff4757"/><circle cx="635" cy="136" r="5" fill="#ffa502"/><circle cx="635" cy="149" r="5.5" fill="#2ed573"/>
+        </g>
+        <ellipse cx="352" cy="368" rx="54" ry="15" fill="#07090d"/><ellipse cx="352" cy="366" rx="44" ry="10" fill="#13171e"/>
+        <!-- bounding boxes, each wrapping the object above with a matching label -->
+        <g class="dets" fill="none" stroke-width="2.5">
+          <rect x="88" y="200" width="74" height="150" stroke="#2ed573"/>
+          <rect x="88" y="182" width="92" height="18" fill="#2ed573"/><text x="92" y="195" font-size="12" font-weight="700" fill="#06231a">pedestrian 0.93</text>
+          <rect x="552" y="206" width="64" height="128" stroke="#2ed573"/>
+          <rect x="552" y="188" width="92" height="18" fill="#2ed573"/><text x="556" y="201" font-size="12" font-weight="700" fill="#06231a">pedestrian 0.88</text>
+          <rect x="228" y="206" width="110" height="122" stroke="#ffa502"/>
+          <rect x="228" y="188" width="74" height="18" fill="#ffa502"/><text x="232" y="201" font-size="12" font-weight="700" fill="#2a1c00">cyclist 0.84</text>
+          <rect x="388" y="178" width="140" height="78" stroke="#ff4757"/>
+          <rect x="388" y="160" width="76" height="18" fill="#ff4757"/><text x="392" y="173" font-size="12" font-weight="700" fill="#fff">vehicle 0.92</text>
+          <rect x="616" y="108" width="40" height="60" stroke="#ff6b81"/>
+          <rect x="544" y="90" width="112" height="18" fill="#ff6b81"/><text x="548" y="103" font-size="12" font-weight="700" fill="#fff">traffic_light 0.88</text>
+          <rect x="296" y="346" width="116" height="42" stroke="#00a8ff"/>
+          <rect x="296" y="328" width="76" height="18" fill="#00a8ff"/><text x="300" y="341" font-size="12" font-weight="700" fill="#04243a">pothole 0.71</text>
+        </g>
+      </svg>
+      <div class="scan"></div>
+      <div class="classbadge">YOLOv12-S · 23 classes</div>
+      <div class="fpsbadge">37 FPS · MPS</div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: ACTIVE LOOP -->
+<div class="sec" id="s5">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:radial-gradient(ellipse at center,rgba(255,255,255,.35),rgba(255,255,255,.7))"></div>
+  <div class="sec-content">
+    <div class="eyebrow">Loop 2 · Voice-powered</div>
+    <div class="voice-cmd">"What's in front of me?"</div>
+    <div class="wave-wrap" id="waveWrap"></div>
+    <div class="headline" style="font-size:clamp(24px,4vw,44px)">It doesn't just detect.<br>It understands.</div>
+  </div>
+</div>
+
+<!-- S6: STATS -->
+<div class="sec" id="s6">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:rgba(255,255,255,.82)"></div>
+  <div class="sec-content">
+    <div class="eyebrow">Trained and validated</div>
+    <div class="headline" style="font-size:clamp(24px,4vw,40px);margin-bottom:8px">The numbers behind AXON</div>
+    <div class="stats-grid">
+      <div class="scard"><div class="scard-num" data-t="51805" data-s="">0</div><div class="scard-label">Images</div></div>
+      <div class="scard"><div class="scard-num" data-t="171852" data-s="">0</div><div class="scard-label">Annotations</div></div>
+      <div class="scard"><div class="scard-num" data-t="70.9" data-s="%" data-d="1">0</div><div class="scard-label">mAP@50</div></div>
+      <div class="scard"><div class="scard-num" data-t="78.3" data-s="%" data-d="1">0</div><div class="scard-label">Precision</div></div>
+    </div>
+    <div class="stats-grid2">
+      <div class="scard"><div class="scard-num" data-t="65.0" data-s="%" data-d="1">0</div><div class="scard-label">Recall</div></div>
+      <div class="scard"><div class="scard-num" data-t="23" data-s="">0</div><div class="scard-label">Classes</div></div>
+      <div class="scard"><div class="scard-num" data-t="39" data-s="">0</div><div class="scard-label">Sources</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: CLOSING -->
+<div class="sec" id="s7">
+  <div class="sec-bg"><div class="bg-layer"></div><div class="bg-layer"></div></div>
+  <div class="sec-overlay" style="background:transparent"></div>
+  <div class="sec-content">
+    <div class="close-logo">AXON</div>
+    <div class="close-tag">Intelligence you can wear. Safety you can hear.</div>
+    <div class="close-team">Walk with confidence.</div>
+    <div class="badges">
+      <span class="badge">UTS AI Showcase 2026</span>
+      <span class="badge">Group 95</span>
+      <span class="badge">Master of IT</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div id="ctrl">
+  <button class="cbtn" id="pauseBtn" aria-label="Pause"><div class="pi"><span></span><span></span></div></button>
+  <div id="pbar"><div id="pfill"></div></div>
+  <span id="tdisp">0:00 / 4:10</span>
+  <button class="cbtn" id="muteBtn" aria-label="Mute">🔊</button>
+</div>
+
+<!-- BACKGROUND MUSIC ── save your chosen royalty-free track next to this file as background-music.mp3 -->
+<audio id="bgm" src="background-music.mp3" loop preload="auto"></audio>
+
+<script>
+const SECS=[
+  {id:'s1',dur:15,v:"Every day, over 2.2 billion people worldwide live with some form of visual impairment. For them, something as simple as crossing a street can be life-threatening."},
+  {id:'s2',dur:35,v:"Traditional mobility aids like white canes and guide dogs are valuable, but they have limits. They can't warn you about a cyclist approaching from behind, a car running a red light, or a wet surface up ahead. They can't read a sign, describe a scene, or answer a question about what's around you. The world is full of invisible dangers, and existing tools simply weren't designed to see them all."},
+  {id:'s3',dur:50,v:"Meet AXON. A wearable, agentic spatial assistant that gives visually impaired pedestrians a real-time AI co-pilot. Whether you're streaming video from Meta AI smart glasses, or simply using your iPhone's camera, AXON works with the devices you already own. Pair it with AirPods, and it continuously scans your surroundings, alerting you to hazards the moment they appear. No special hardware. No expensive equipment. Just intelligence, always watching, always listening."},
+  {id:'s4',dur:50,v:"At the heart of AXON is a dual-loop architecture. The first loop is always on. A passive safety system. A custom-trained YOLOv12 model runs at 25 to 40 frames per second, scanning every frame for danger. It detects 23 classes of real-world hazards. Vehicles, cyclists, potholes, bollards, construction barriers, traffic lights, and more. The moment a threat enters your path, you hear an instant spoken alert through your AirPods. No button to press. No app to open. It just works."},
+  {id:'s5',dur:40,v:"The second loop is powered by your voice. Ask AXON, What's in front of me? Or, Is it safe to cross? And it listens. Your speech is processed through Whisper, your intent is routed intelligently, and a vision-language model analyses the scene to give you a natural, spoken answer. AXON doesn't just detect. It understands. It's not a tool you use. It's a companion that sees for you."},
+  {id:'s6',dur:30,v:"Behind AXON is a dataset of over 51,000 images and nearly 172,000 bounding boxes, assembled from 39 sources and trained across multiple iterations on cloud GPUs. The result: a model achieving a mAP at 50 of 70.9 percent, a precision of 78.3 percent, and a recall of 65 percent. Every number here represents a hazard caught, a danger avoided, a safer step forward."},
+  {id:'s7',dur:30,v:"AXON was built on a single belief: that everyone deserves to move through the world with confidence and independence. By turning the devices you already carry into a real-time AI companion, it brings awareness and safety to every step you take. This isn't just assistive technology — it's a new sense of freedom. This is AXON. Intelligence you can wear. Safety you can hear."}
+];
+let cur=-1,elapsed=0,paused=false,muted=false;
+const synth=window.speechSynthesis;   // kept only as a safety fallback if an mp3 is missing
+const bgm=document.getElementById('bgm');
+const BGM_VOL=0.14; // sits low under the narration
+function fadeAudio(el,to,ms){
+  if(!el)return;
+  const from=el.volume,steps=Math.max(1,Math.round(ms/50));let i=0;
+  clearInterval(el._fade);
+  el._fade=setInterval(()=>{
+    i++;el.volume=Math.min(1,Math.max(0,from+(to-from)*i/steps));
+    if(i>=steps){clearInterval(el._fade);if(to===0)try{el.pause()}catch(e){}}
+  },50);
+}
+
+// ── NARRATION (Amazon Polly MP3s) ── one <audio> per section; the show is AUDIO-DRIVEN:
+// each section advances the instant its clip ends, so there are no hand-timed dead-air gaps.
+const NARR_GAP=0.35;        // seconds of breathing room between sections
+const NARR_RATE=0.9;        // narration playback speed (1=as-generated; <1 = slower/calmer)
+const BGM_DUCK=0.06;        // music volume while the voice is talking
+const BGM_UP=0.16;          // music volume in the gaps / intro / outro
+const narr={}, durs={}, narrFail={};
+let activeAudio=null, gapTimer=null, fbTimer=null, inGap=false, rafId=null, fbStart=0;
+SECS.forEach(s=>{
+  const a=new Audio(`narration/${s.id}.mp3`);
+  a.preload='auto';
+  a.defaultPlaybackRate=NARR_RATE;a.playbackRate=NARR_RATE;
+  a.preservesPitch=a.mozPreservesPitch=a.webkitPreservesPitch=true; // slow down without dropping pitch
+  a.addEventListener('loadedmetadata',()=>{durs[s.id]=a.duration;});
+  a.addEventListener('error',()=>{narrFail[s.id]=true;});
+  a.addEventListener('ended',()=>{if(a===activeAudio&&!inGap)onNarrationEnd();});
+  narr[s.id]=a;
+});
+function secLen(i){return (durs[SECS[i].id]||SECS[i].dur)/NARR_RATE;}
+function offsetBefore(i){let t=0;for(let k=0;k<i;k++)t+=secLen(k)+NARR_GAP;return t;}
+function totalTime(){let t=0;for(let k=0;k<SECS.length;k++)t+=secLen(k)+(k<SECS.length-1?NARR_GAP:0);return t;}
+function duckMusic(down){if(!muted)fadeAudio(bgm,down?BGM_DUCK:BGM_UP,500);}
+function updateProgress(){
+  if(cur<0)return;
+  const T=totalTime(),id=SECS[cur].id;
+  let t;
+  if(narrFail[id])t=Math.min(secLen(cur),(performance.now()-fbStart)/1000);
+  else t=inGap?secLen(cur):(activeAudio&&!isNaN(activeAudio.currentTime)?activeAudio.currentTime/NARR_RATE:0);
+  elapsed=Math.min(T,offsetBefore(cur)+t);
+  document.getElementById('pfill').style.width=(elapsed/T*100)+'%';
+  document.getElementById('tdisp').textContent=`${fmt(elapsed)} / ${fmt(T)}`;
+}
+function loop(){rafId=requestAnimationFrame(loop);if(!paused)updateProgress();}
+function playNarration(i){
+  const s=SECS[i],a=narr[s.id];activeAudio=a;inGap=false;
+  duckMusic(true);
+  if(narrFail[s.id]||!a){playFallback(i);return;}
+  a.muted=muted;try{a.currentTime=0;}catch(e){}
+  if(!paused)a.play().catch(()=>{narrFail[s.id]=true;playFallback(i);});
+}
+function onNarrationEnd(){inGap=true;duckMusic(false);scheduleGap();}
+function scheduleGap(){clearTimeout(gapTimer);gapTimer=setTimeout(()=>{inGap=false;advance();},NARR_GAP*1000);}
+// safety net: if an mp3 is missing, fall back to the browser voice + dur timer so the show never stalls
+function playFallback(i){
+  const s=SECS[i];fbStart=performance.now();clearTimeout(fbTimer);
+  const go=()=>{if(activeAudio===narr[s.id]&&!inGap)onNarrationEnd();};
+  if(synth&&!muted){try{synth.cancel();const u=new SpeechSynthesisUtterance(s.v);u.rate=0.9;u.onend=u.onerror=go;synth.speak(u);}catch(e){fbTimer=setTimeout(go,s.dur*1000);}}
+  else fbTimer=setTimeout(go,s.dur*1000);
+}
+
+// ── VISUALS MATCHED TO WHAT EACH SECTION IS ACTUALLY SAYING ──
+// Only confirmed, free, no-watermark stills are used as images. s3/s5/s6 have no photo —
+// their meaning is carried by the device cards, the voice waveform, and the animated counters.
+const P_BLIND='https://images.pexels.com/videos/8781653/adult-architecture-bench-building-8781653.jpeg?auto=compress&cs=tinysrgb&w=1920'; // visually impaired man, city street
+const P_STREET='https://images.pexels.com/videos/18361966/busy-street-canada-city-city-square-18361966.jpeg?auto=compress&cs=tinysrgb&w=1920'; // busy pedestrian street
+const P_CANE='https://images.pexels.com/videos/7182233/administration-adult-architecture-battle-7182233.jpeg?auto=compress&cs=tinysrgb&w=1920'; // person walking with a white cane
+
+// fallback stills cycle (movement) behind the videos; only seen if a clip is slow/unavailable
+const BG={
+  s1:[P_BLIND,P_STREET,P_CANE],
+  s2:[P_CANE,P_BLIND,P_STREET],   // distinct first frame from s1
+  s3:['s3-poster.jpg'],           // Meet AXON: city phone+earphones clip (distinct from s7's closing clip)
+  s4:[P_STREET,P_BLIND],
+  s7:[P_BLIND,P_CANE]
+}; // s5/s6 intentionally photo-less (waveform / counters carry them)
+const FRAMES=[]; // the detection feed is now a controlled SVG scene, not a photo
+
+// ── BACKGROUND VIDEOS ── footage that matches each section's narration (stills cycle underneath as fallback)
+const V_BLIND_CITY='https://videos.pexels.com/video-files/8781653/8781653-uhd_2732_1440_25fps.mp4';   // visually impaired man walking a city street with a white cane
+const V_CANE_WET='https://videos.pexels.com/video-files/8322693/8322693-uhd_2732_1440_25fps.mp4';     // man with white cane, overcast/wet path
+const V_STREET='https://videos.pexels.com/video-files/18361966/18361966-uhd_2560_1440_60fps.mp4';     // busy pedestrian street — the scene being scanned
+const V_CONFIDENT='https://videos.pexels.com/video-files/5390252/5390252-uhd_2560_1440_30fps.mp4';    // blind man walking confidently
+const V_CITY_PHONE='https://videos.pexels.com/video-files/7966942/7966942-uhd_3840_2160_25fps.mp4';   // woman in a modern city using her phone + earphones (AXON's iPhone/AirPods use case)
+const VID={s1:V_BLIND_CITY, s2:V_CANE_WET, s3:V_CITY_PHONE, s4:V_STREET, s7:V_CONFIDENT};
+const POSTER={s1:P_BLIND, s2:P_CANE, s3:'s3-poster.jpg', s4:P_STREET, s7:P_BLIND}; // s3 = matching frame so the cane clip never flashes
+
+// preload everything, remember which actually loaded so the rotator skips broken images
+const loadedBg={};
+const allImgs=[...new Set([P_BLIND,P_STREET,...Object.values(BG).flat(),...FRAMES])];
+let loaded=0;
+allImgs.forEach(src=>{const i=new Image();i.onload=()=>{loadedBg[src]=true;done()};i.onerror=()=>done();i.src=src});
+function done(){loaded++;if(loaded>=allImgs.length)document.getElementById('preloader').classList.add('done')}
+setTimeout(()=>document.getElementById('preloader').classList.add('done'),5000);
+
+// voice bars
+const ww=document.getElementById('waveWrap');
+for(let i=0;i<32;i++){const b=document.createElement('div');b.className='wbar';b.style.animationDelay=`${Math.random()*1.2}s`;b.style.animationDuration=`${0.6+Math.random()*0.8}s`;ww.appendChild(b)}
+
+// format time
+function fmt(s){return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`}
+
+// (browser speechSynthesis narration removed — Polly mp3s drive the show now; see playFallback)
+
+// ── BACKGROUND ROTATOR ── crossfades through each section's playlist with fresh pan/zoom every cycle
+let rotTimer=null, kbIdx=0;
+const KB=['kbA','kbB','kbC'];
+function paintLayer(layer,url){
+  layer.style.backgroundImage=`url('${url}')`;
+  layer.classList.remove('kbA','kbB','kbC');void layer.offsetWidth;
+  layer.classList.add(KB[kbIdx%3]);kbIdx++;
+  layer.classList.add('show');
+}
+function startRotator(secId){
+  stopRotator();
+  const el=document.getElementById(secId);if(!el)return;
+  const layers=el.querySelectorAll('.sec-bg .bg-layer');if(layers.length<2)return;
+  let list=(BG[secId]||[]).filter(u=>loadedBg[u]);
+  if(!list.length)list=(BG[secId]||[]).slice(0,1);
+  if(!list.length)return;
+  let idx=0, active=0;
+  layers[1].classList.remove('show');
+  paintLayer(layers[0],list[idx]);
+  if(list.length<2)return;
+  rotTimer=setInterval(()=>{
+    if(paused)return;
+    idx=(idx+1)%list.length; active^=1;
+    paintLayer(layers[active],list[idx]);
+    layers[active^1].classList.remove('show');
+  },4600);
+}
+function stopRotator(){if(rotTimer){clearInterval(rotTimer);rotTimer=null}}
+
+// ── DETECTION FEED (Section 4) ── the scene and its bounding boxes are drawn in SVG so every
+// box wraps the object it labels. JS only keeps the FPS readout ticking for a live feel.
+let detTimer=null;
+function detTick(){
+  const fps=document.querySelector('#s4 .fpsbadge');
+  if(fps)fps.textContent=`${35+Math.floor(Math.random()*4)} FPS · MPS`;
+}
+function startDet(){stopDet();detTick();detTimer=setInterval(()=>{if(!paused)detTick()},1400)}
+function stopDet(){if(detTimer){clearInterval(detTimer);detTimer=null}}
+
+// ── VIDEO LAYER ── build a lazy <video> for each section that has footage; fall back to images on any failure
+Object.keys(VID).forEach(id=>{
+  const sec=document.getElementById(id);if(!sec)return;
+  const v=document.createElement('video');
+  v.className='sec-vid';v.muted=true;v.loop=true;v.playsInline=true;
+  v.setAttribute('muted','');v.setAttribute('playsinline','');v.preload='none';
+  if(POSTER[id])v.poster=POSTER[id];
+  v.dataset.src=VID[id];
+  const bg=sec.querySelector('.sec-bg');
+  bg.parentNode.insertBefore(v,bg.nextSibling);
+});
+function startVid(secId){
+  document.querySelectorAll('.sec-vid').forEach(v=>{
+    if(v.closest('.sec').id!==secId){v.classList.remove('show');try{v.pause()}catch(e){}}
+  });
+  const sec=document.getElementById(secId);if(!sec)return;
+  const v=sec.querySelector('.sec-vid');if(!v||!v.dataset.src)return;
+  v.classList.add('show');                 // relevant poster still shows instantly
+  if(!v.getAttribute('src')){
+    v.setAttribute('src',v.dataset.src);
+    v.addEventListener('canplay',()=>{if(!paused)v.play().catch(()=>{})},{once:true});
+    v.load();
+  }else if(!paused){v.play().catch(()=>{})}
+}
+function pauseVids(){document.querySelectorAll('.sec-vid').forEach(v=>{try{v.pause()}catch(e){}})}
+function resumeVids(){document.querySelectorAll('.sec-vid.show').forEach(v=>v.play().catch(()=>{}))}
+
+function showSec(i){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  stopRotator();stopDet();
+  if(i>=0&&i<SECS.length){
+    const id=SECS[i].id;
+    document.getElementById(id).classList.add('active');
+    startRotator(id);
+    startVid(id);
+    if(i===3)startDet();
+    if(i===5)animCounters();
+  }
+}
+
+function animCounters(){
+  document.querySelectorAll('#s6 .scard-num').forEach(el=>{
+    const target=parseFloat(el.dataset.t),suf=el.dataset.s||'',dec=parseInt(el.dataset.d)||0,dur=1800,st=performance.now();
+    (function tick(now){
+      const p=Math.min((now-st)/dur,1),e=1-Math.pow(1-p,3),v=e*target;
+      el.textContent=dec?v.toFixed(dec)+suf:Math.floor(v).toLocaleString()+suf;
+      if(p<1)requestAnimationFrame(tick);
+    })(st);
+  });
+}
+
+function advance(){
+  cur++;
+  if(cur>=SECS.length){endShow();return;}
+  showSec(cur);
+  playNarration(cur);
+}
+function endShow(){
+  clearTimeout(gapTimer);clearTimeout(fbTimer);
+  try{if(activeAudio)activeAudio.pause();}catch(e){}
+  if(synth)synth.cancel();
+  fadeAudio(bgm,0,1600);updateProgress();
+}
+
+function start(){
+  document.getElementById('landing').classList.add('out');
+  document.getElementById('ctrl').classList.add('on');
+  cur=-1;elapsed=0;
+  document.getElementById('pfill').style.width='0%';
+  bgm.currentTime=0;bgm.volume=0;bgm.muted=muted;bgm.play().catch(()=>{});fadeAudio(bgm,BGM_UP,1400);
+  if(!rafId)loop();
+  advance();
+}
+
+document.getElementById('playBtn').addEventListener('click',start);
+
+document.getElementById('pauseBtn').addEventListener('click',function(){
+  paused=!paused;
+  if(paused){
+    try{if(activeAudio)activeAudio.pause()}catch(e){}
+    if(synth)synth.pause();clearTimeout(gapTimer);clearTimeout(fbTimer);
+    pauseVids();try{bgm.pause()}catch(e){}
+    this.innerHTML='<div class="play-tri"></div>';
+  }else{
+    if(synth)synth.resume();resumeVids();bgm.play().catch(()=>{});
+    if(inGap)scheduleGap();
+    else if(activeAudio&&!narrFail[SECS[cur].id])activeAudio.play().catch(()=>{});
+    this.innerHTML='<div class="pi"><span></span><span></span></div>';
+  }
+});
+
+document.getElementById('muteBtn').addEventListener('click',function(){
+  muted=!muted;this.textContent=muted?'🔇':'🔊';
+  bgm.muted=muted;
+  if(activeAudio)activeAudio.muted=muted;
+  if(muted&&synth)synth.cancel();
+});
+
+document.getElementById('pbar').addEventListener('click',e=>{
+  const r=e.currentTarget.getBoundingClientRect();
+  const T=totalTime();
+  const target=Math.max(0,Math.min(T-0.05,(e.clientX-r.left)/r.width*T));
+  let i=0,acc=0;
+  for(;i<SECS.length;i++){const len=secLen(i)+NARR_GAP;if(target<acc+len)break;acc+=len;}
+  if(i>=SECS.length)i=SECS.length-1;
+  const into=Math.max(0,target-acc);
+  clearTimeout(gapTimer);clearTimeout(fbTimer);inGap=false;
+  try{if(activeAudio)activeAudio.pause()}catch(e2){}
+  if(synth)synth.cancel();
+  cur=i;showSec(cur);
+  const a=narr[SECS[i].id];activeAudio=a;duckMusic(true);
+  if(a&&!narrFail[SECS[i].id]){a.muted=muted;try{a.currentTime=into*NARR_RATE}catch(e2){}if(!paused)a.play().catch(()=>{});}
+  else playFallback(i);
+  updateProgress();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();
+    if(!document.getElementById('landing').classList.contains('out'))start();   // not started yet → play
+    else document.getElementById('pauseBtn').click();}                          // playing → pause/resume
+  if(e.code==='KeyM')document.getElementById('muteBtn').click();
+  if(e.code==='ArrowRight'&&cur<SECS.length-1){
+    clearTimeout(gapTimer);clearTimeout(fbTimer);inGap=false;
+    try{if(activeAudio)activeAudio.pause()}catch(e2){}
+    if(synth)synth.cancel();
+    advance();
+  }
+});
+
+if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>synth.getVoices();
+synth.getVoices();
+
+// clean recording mode: open the page with #record (or press R) to hide the controls bar + cursor
+function applyRecMode(){if(location.hash.toLowerCase()==='#record')document.body.classList.add('rec');}
+applyRecMode();window.addEventListener('hashchange',applyRecMode);
+document.addEventListener('keydown',e=>{if(e.code==='KeyR')document.body.classList.toggle('rec');});
+</script>
+</body>
+</html>
